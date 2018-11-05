@@ -1,14 +1,20 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
+import { BookListComponent } from './book-list/book-list.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    BookListComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    NgbModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
