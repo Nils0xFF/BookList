@@ -45,8 +45,6 @@ export class BookListComponent implements OnInit {
         'year': this.inputYear,
         'pages': this.inputPages
       };
-      this.setNewID();
-      this.saveToLocalStorage();
     } else {
       this.books.push({
         'id': this.newID++,
@@ -56,9 +54,11 @@ export class BookListComponent implements OnInit {
         'year': this.inputYear,
         'pages': this.inputPages
       });
-      this.saveToLocalStorage();
-      this.modalService.dismissAll();
     }
+    this.setNewID();
+    this.saveToLocalStorage();
+    this.saveToLocalStorage();
+    this.modalService.dismissAll();
   }
 
   deleteAll() {
@@ -117,5 +117,7 @@ export class BookListComponent implements OnInit {
         'pages': 185
       }
     ];
+    this.setNewID();
   }
 }
+
