@@ -1,5 +1,7 @@
-import { Component, OnInit, } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Book } from '../book';
+import { BookService } from '../book.service';
 
 @Component({
   selector: 'app-book-list',
@@ -8,56 +10,34 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 })
 
 export class BookListComponent implements OnInit {
-  editMode = false;
   inputAuthor = 'Author';
   inputTitle = 'Title';
   inputPublisher = 'Publisher';
   inputYear = 0;
   inputPages = 0;
-  newID = 1;
-  books = [];
-  constructor(private modalService: NgbModal) { }
+  editMode = false;
+  editBook: Book = null;
+  books: Book[];
+  constructor(private modalService: NgbModal, private bookService: BookService) { }
 
   ngOnInit() {
-    this.loadFromLocalStorage();
-    this.setNewID();
-  }
-
-  setNewID() {
-    if (this.books.length > 0) {
-      this.newID = this.books[this.books.length - 1].id + 1;
-    } else {
-      this.newID = 1;
-    }
+    this.getBooks();
   }
 
   open(modal) {
+    this.editBook = null;
     this.modalService.open(modal, { windowClass: 'container fade modal-large', size: 'lg' });
   }
 
   addEntry() {
-    if (this.newID > 0 && this.newID < this.books.length) {
-      this.books[this.newID] = {
-        'id': this.books[this.newID].id,
-        'title': this.inputTitle,
-        'author': this.inputAuthor,
-        'publisher': this.inputPublisher,
-        'year': this.inputYear,
-        'pages': this.inputPages
-      };
-    } else {
-      this.books.push({
-        'id': this.newID++,
-        'title': this.inputTitle,
-        'author': this.inputAuthor,
-        'publisher': this.inputPublisher,
-        'year': this.inputYear,
-        'pages': this.inputPages
+    this.bookService.addBook({
+      title: this.inputTitle,
+      author: this.inputAuthor, pages: this.inputPages,
+      publisher: this.inputPublisher, year: this.inputYear
+    } as Book)
+      .subscribe(book => {
+        this.books.push(book);
       });
-    }
-    this.setNewID();
-    this.saveToLocalStorage();
-    this.saveToLocalStorage();
     this.modalService.dismissAll();
   }
 
@@ -65,59 +45,45 @@ export class BookListComponent implements OnInit {
     if (confirm('Wirklich alle Einträge löschen?')) {
       this.books = [];
     }
-    this.saveToLocalStorage();
   }
 
-  deleteEntry(i) {
-    if (confirm('Wirklich Löschen?')) {
-      this.books.splice(i, 1);
-    }
-    this.saveToLocalStorage();
-  }
-
-  editEntry(modal, i) {
-    this.newID = this.books[i].author;
-    this.inputAuthor = this.books[i].author;
-    this.inputPages = this.books[i].pages;
-    this.inputPublisher = this.books[i].publisher;
-    this.inputTitle = this.books[i].title;
-    this.inputYear = this.books[i].year;
-    this.open(modal);
-    this.newID = i;
-  }
-
-  private saveToLocalStorage() {
-    localStorage['books'] = JSON.stringify(this.books);
-  }
-
-  private loadFromLocalStorage() {
-    if (localStorage['books'] && localStorage['books'].trim() !== '') {
-      this.books = JSON.parse(localStorage['books']);
+  submitForm() {
+    if (this.editBook) {
+      this.updateBook(this.editBook.id);
     } else {
-      this.resetBookList();
+      this.addEntry();
     }
   }
 
-  private resetBookList() {
-    this.books = [
-      {
-        'id': 1,
-        'title': 'Mein Buch',
-        'author': 'Nils Geschwinde',
-        'publisher': 'Elster Verlag',
-        'year': 2017,
-        'pages': 205
-      },
-      {
-        'id': 2,
-        'title': 'Mein Buch 2',
-        'author': 'Nils Geschwinde',
-        'publisher': 'Elster Verlag',
-        'year': 2018,
-        'pages': 185
-      }
-    ];
-    this.setNewID();
+  deleteBook(book: Book): void {
+    this.books = this.books.filter(h => h !== book);
+    this.bookService.delBook(book).subscribe();
   }
+
+  editEntry(modal, book) {
+    this.open(modal);
+    this.editBook = book;
+    this.inputAuthor = this.editBook.author;
+    this.inputPages = this.editBook.pages;
+    this.inputPublisher = this.editBook.publisher;
+    this.inputTitle = this.editBook.title;
+    this.inputYear = this.editBook.year;
+  }
+
+  updateBook(updateID: number): void {
+    this.bookService.updateBook({
+      id: updateID, title: this.inputTitle,
+      author: this.inputAuthor, pages: this.inputPages,
+      publisher: this.inputPublisher, year: this.inputYear
+    } as Book)
+      .subscribe();
+    this.editBook = null;
+    this.modalService.dismissAll();
+  }
+
+  getBooks(): void {
+    this.bookService.getBooks().subscribe(books => this.books = books);
+  }
+
 }
 

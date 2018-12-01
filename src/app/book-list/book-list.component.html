@@ -19,8 +19,8 @@
           <td data-type='publisher'>{{book.publisher}}</td>
           <td data-type='year'>{{book.year}}</td>
           <td data-type='pages'>{{book.pages}}</td>
-          <td><button type="button" class="btn btn-danger delete-button btn-md btn-sm btn-block" (click)="deleteEntry(i)">Delete</button></td>
-          <td><button type="button" class="btn btn-success edit-button btn-md btn-sm btn-block" (click)="editEntry(input, i)">Edit</button></td>
+          <td><button type="button" class="btn btn-danger delete-button btn-md btn-sm btn-block" (click)="deleteBook(book)">Delete</button></td>
+          <td><button type="button" class="btn btn-success edit-button btn-md btn-sm btn-block" (click)="editEntry(input, book)">Edit</button></td>
         </tr>
       </tbody>
     </table>
@@ -47,14 +47,6 @@
     <div class="modal-body">
         <form action="" id="inputForm" class="my-5">
             <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="id">ID</label>
-                        <input [(ngModel)]="newID" type="number" name="id" id="id" class="form-control" placeholder="ID"
-                            aria-describedby="helpId" disabled>
-                        <small id="helpId" class="text-muted">The new ID of the entry</small>
-                    </div>
-                </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="title">Titel</label>
@@ -104,7 +96,7 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Close')">Close</button>
-        <button type="submit" class="btn btn-primary" (click)="addEntry()">Hinzufügen</button>
+        <button type="submit" class="btn btn-primary" (click)="submitForm()">Hinzufügen</button>
     </div>
   </ng-template>
 
